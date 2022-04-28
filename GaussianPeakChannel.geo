@@ -35,66 +35,83 @@ Point(4) = {0,Ly,0,lc};
 // Mesh 2;
 
 //Generate Gaussian Points
-step = 2;
-s=0;
+step = 0.2;
+// s=0;
 ptr=0;
-
-For x In {Lx/2-0.1*Lx:Lx/2+0.1*Lx:step}
+s=0;
+cl = 0;
+For x In {Lx/2-0.1*Lx:Lx/2:step}
     p = newp;
-    s+=1;
     y = alpha*Exp(-1.0*((x-(Lx/2))^2/2.5^2));
     Point(p) = {x,y,0,lc};
     If (p-1 > 4)
-        Spline(s) = {p,p-1};
+        s = newc;
+        // Spline(s) = {p-1,p};
     EndIf
     orig_point_list[ptr]=p;
+    orig_spline_list[ptr]=s;
     ptr+=1;
 
     
 EndFor
 
-step=Pi/4;
+// Curve Loop(cl) = {orig_spline_list[]};
 
+
+step=Pi/16;
+// m=0;
+d=s+1;
 For i In {0:#orig_point_list[]-1:1}
-    For theta In {step:Pi:step}
+    ptrcs=0;
+    For theta In {step:2*Pi:step}
         If (theta==step)
             old = orig_point_list[i];
-            s+=1;
+            d+=newc;
+            xyz[]=Point{orig_point_list[i]};
             
-            my_new_point[] = Rotate {{0,1,0},{Lx/2,0,0},theta} {Duplicata{Point{orig_point_list[i]};}};
+            my_new_point[] = Rotate {{0,1,0},{Lx/2,xyz[1],0},theta} {Duplicata{Point{orig_point_list[i]};}};
+
             Printf("New Point %g",my_new_point[0]);
     
     
-            Spline(s) = {orig_point_list[i],my_new_point[0]};
+            Spline(d) = {orig_point_list[i],my_new_point[0]};
+            my_circspline_list[ptrcs]=d;
+            ptrcs+=1;
             // p+=1;
         
         Else
             old = my_new_point[0];
+
+            xyz[]=Point{orig_point_list[i]};
+            
             Printf("Old Point %g",old);
-            s+=1;
-           my_new_point[] = Rotate {{0,1,0},{Lx/2,0,0},theta} {Duplicata{Point{orig_point_list[i]};}};
-            Spline(s) = {old,my_new_point[0]};
+            d=newc;
+           my_new_point[] = Rotate {{0,1,0},{Lx/2,xyz[1],0},theta} {Duplicata{Point{orig_point_list[i]};}};
+
+            Spline(d) = {old,my_new_point[0]};
+            my_circspline_list[ptrcs]=d;
+            ptrcs+=1;
             // p+=1;
             Printf("New Point %g",my_new_point[0]);
             
     
         EndIf
-        p=my_new_point[0];
+        m=my_new_point[0];
     
     
     
     
     EndFor
-    Spline(s+1) = {p,orig_point_list[i]};
+    d=newc;
+    Spline(d) = {m,orig_point_list[i]};
+    ptrcs+=1;
+    Curve Loop(cl) = {my_circspline_list[]};
+    cl+=1;
+
+
 
     EndFor
-
-
-
-// Line(1) = {1,5};
-
-// Line(5) = {p,2};
-
+   
 
 
 
