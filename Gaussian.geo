@@ -20,19 +20,19 @@ Point(2) = {Lx,0,0,lc};
 Point(3) = {Lx,Ly,0,lc};
 Point(4) = {0,Ly,0,lc};
 
-// //Lines
+//Lines
 
-// Line(2) = {2,3};
-// Line(3) = {3,4};
-// Line(4) = {4,1};
+Line(2) = {2,3};
+Line(3) = {3,4};
+Line(4) = {4,1};
 
-// //Curve Loops
-// Curve Loop(1)={1,2,3,4};
+//Curve Loops
+Curve Loop(1)={1,2,3,4};
 
-////Surface
-// Surface(1)={1};
+//Surface
+Surface(1)={1};
 
-// Mesh 2;
+
 
 //Generate Gaussian Points
 step = 2;
@@ -61,21 +61,16 @@ For i In {0:#orig_point_list[]-1:1}
             old = orig_point_list[i];
             s+=1;
             
-            my_new_point[] = Rotate {{0,1,0},{Lx/2,0,0},theta} {Duplicata{Point{orig_point_list[i]};}};
-            Printf("New Point %g",my_new_point[0]);
-    
-    
+            my_new_point[] = Rotate {{0,1,0},{Lx/2,0,0},theta} {Duplicata{Point{orig_point_list[i]};}}; 
             Spline(s) = {orig_point_list[i],my_new_point[0]};
             // p+=1;
         
         Else
             old = my_new_point[0];
-            Printf("Old Point %g",old);
             s+=1;
            my_new_point[] = Rotate {{0,1,0},{Lx/2,0,0},theta} {Duplicata{Point{orig_point_list[i]};}};
             Spline(s) = {old,my_new_point[0]};
             // p+=1;
-            Printf("New Point %g",my_new_point[0]);
             
     
         EndIf
@@ -86,14 +81,9 @@ For i In {0:#orig_point_list[]-1:1}
     
     EndFor
     Spline(s+1) = {p,orig_point_list[i]};
+    
 
     EndFor
-
-
-
-// Line(1) = {1,5};
-
-// Line(5) = {p,2};
 
 
 

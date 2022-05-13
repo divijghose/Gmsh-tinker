@@ -6,7 +6,7 @@
 //  Description : 
 // -----------------------------------------------------------------------------
 
-lc = 1e-2;
+lc = 1e1;
 Lx = 100;
 Ly = 10;
 Lz = 50;
@@ -52,7 +52,7 @@ Curve Loop(6) = {10,6,-12,-2}; //Side
 
 
 //Surface 
-// Surface(1) = {1}; // Bottom
+
 Surface(2) = {2}; // Top
 Surface(3) = {3}; // Front
 Surface(4) = {4}; // Back
@@ -93,8 +93,9 @@ Curve Loop(cl) = {orig_spline_list[]};
 theta=0;
 step=Pi/16;
 d=0;
-
-For thetastep In {0:30:1}
+ptrsurf=0;
+steplim=(2*Pi/step)-2;
+For thetastep In {0:steplim:1}
     theta=step;
     ptrn=0;
     For i In {0:#orig_point_list[]-1:1}
@@ -116,6 +117,13 @@ For thetastep In {0:30:1}
     For i In {0:#orig_point_list[]-1:1}
         k = newc;
         Spline(k) = {orig_point_list[i],my_new_point_list[i]};
+        If (i==0)
+            gauss_base_curve_list[thetastep]=k;
+        EndIf
+        If (i==(#orig_point_list[]-1))
+            gauss_top_curve_list[thetastep]=k;
+        EndIf
+
         my_cross_spline_list[ptrc]=k;
         ptrc+=1;
     EndFor
@@ -124,7 +132,9 @@ For thetastep In {0:30:1}
         cl+=1;
         surf=news;
         Curve Loop(cl) = {orig_spline_list[i-1],my_cross_spline_list[i],-1*new_spline_list[i-1],-1*my_cross_spline_list[i-1]};
-        Ruled Surface(surf)={cl};
+        Surface(surf)={cl};
+        gauss_surf_list[ptrsurf]=surf;
+        ptrsurf+=1;
     EndFor
 
     For i In {0:#orig_point_list[]-1:1}
@@ -141,60 +151,41 @@ ptrc=0;
 For i In {0:#orig_point_list[]-1:1}
     k = newc;
     Spline(k) = {orig_point_list_copy[i],my_new_point_list[i]};
+    If (i==0)
+        // len = #gauss_base_curve_list[];
+        gauss_base_curve_list[steplim+1]=-1*k;
+    EndIf
+    If (i==(#orig_point_list[]-1))
+        // len = #gauss_top_curve_list[];
+        gauss_top_curve_list[steplim+1]=-1*k;
+    EndIf
     my_cross_spline_list[ptrc]=k;
     ptrc+=1;
 EndFor
+
 For i In {1:#orig_point_list[]-1:1}
     cl+=1;
     surf=news;
     Curve Loop(cl) = {orig_spline_list_copy[i-1],my_cross_spline_list[i],-1*new_spline_list[i-1],-1*my_cross_spline_list[i-1]};
-    Ruled Surface(surf)={cl};
+    Surface(surf)={cl};
+    gauss_surf_list[ptrsurf]=surf;
+    ptrsurf+=1;
 EndFor
 
 
 
+cl+=1; base=cl; Curve Loop(base)=gauss_base_curve_list[];
+cl+=1; top=cl; Curve Loop(top)=gauss_top_curve_list[];
+//+
+Plane Surface(1) = {1, base}; //bottom surface with base of gaussian hole
+//+
+surftop=news; Plane Surface(surftop) = {top}; //top surface 
+// //+
 
-// // m=0;
-// d=s+1;
-// For i In {0:#orig_point_list[]-1:1}
-//     For theta In {step:2*Pi:step}
-//         If (theta==step)
-//             old = orig_point_list[i];
-//             d+=newc;
-//             xyz[]=Point{orig_point_list[i]};
-            
-//             my_new_point[] = Rotate {{0,1,0},{Lx/2,xyz[1],0},theta} {Duplicata{Point{orig_point_list[i]};}};
-
-//             Printf("New Point %g",my_new_point[0]);
-    
-    
-//             Spline(d) = {orig_point_list[i],my_new_point[0]};
-//             // p+=1;
-        
-//         Else
-//             old = my_new_point[0];
-
-//             xyz[]=Point{orig_point_list[i]};
-            
-//             Printf("Old Point %g",old);
-//             d=newc;
-//            my_new_point[] = Rotate {{0,1,0},{Lx/2,xyz[1],0},theta} {Duplicata{Point{orig_point_list[i]};}};
-
-//             Spline(d) = {old,my_new_point[0]};
-//             // p+=1;
-//             Printf("New Point %g",my_new_point[0]);
-            
-    
-//         EndIf
-//         m=my_new_point[0];
-    
-    
-    
-    
-//     EndFor
-//     d+=1;
-//     Spline(d) = {m,orig_point_list[i]};
-
-//     EndFor//
-
-
+Physical Surface("Gaussian Peak",1) = gauss_surf_list[];
+Physical Surface("Gaussian Peak Top",2) = {surftop};
+Physical Surface("Inlet", 3) = {5};
+Physical Surface("Outlet", 4) = {6};
+Physical Surface("Floor", 5) = {1};
+Physical Surface("Top", 6) = {2};
+Physical Surface("Side Walls", 7) = {3,4};

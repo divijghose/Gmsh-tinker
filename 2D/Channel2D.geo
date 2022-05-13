@@ -35,12 +35,12 @@ Surface(1) = {1}; // Bottom
 
 
 //Define Boundary Components
-Physical Curve(0) = {1};
-Physical Curve(1) = {2};
-Physical Curve(2) = {3};
-Physical Curve(3) = {4};
-Physical Surface("Channel") = {1};
+Physical Curve("Bottom Wall",1) = {1};
+Physical Curve("Outlet",2) = {2};
+Physical Curve("Top Wall",3) = {3};
+Physical Curve("Inlet",4) = {4};
+Physical Surface("Channel 2D",1) = {1};
 
 //2D Mesh and save
 // Mesh 2;
-// Save "Channel.msh";
+// Save "Channel2D.msh";

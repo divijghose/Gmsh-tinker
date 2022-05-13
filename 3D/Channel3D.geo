@@ -64,8 +64,15 @@ Surface Loop(1) = {1,2,3,4,5,6};
 //Volume
 Volume(1) = {1};
 
+//Physical 
+Physical Surface("Bottom Wall",1) = {1}; // Bottom
+Physical Surface("Top Wall",2) = {2}; // Top
+Physical Surface("Side Wall",3) = {3,4}; // Front
+Physical Surface("Inlet",4) = {5}; //Side
+Physical Surface("Outlet",5) = {6}; //Side 
 
-Physical Volume("Channel", 1) = {1};
+
+Physical Volume("Channel 3D", 1) = {1};
 
 //2D Mesh and save
 // Mesh 2;
